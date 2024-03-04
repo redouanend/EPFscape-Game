@@ -1,63 +1,64 @@
 import * as fct from "/src/js/fonctions.js";
 
-/***********************************************************************/
-/** VARIABLES GLOBALES 
-/***********************************************************************/
+const SKY_IMAGE_KEY = "img_ciel";
+const BOOK_IMAGE_KEY = "img_livre";
 
-var player; // désigne le sprite du joueur
-var clavier; // pour la gestion du clavier
-var groupe_plateformes;
+var clavier;
+var livreTexte;
 
-// définition de la classe "selection"
 export default class selection extends Phaser.Scene {
   constructor() {
-    super({ key: "selection" }); // mettre le meme nom que le nom de la classe
+    super({ key: "selection" });
   }
 
-  /***********************************************************************/
-  /** FONCTION PRELOAD 
-/***********************************************************************/
-
-  /** La fonction preload est appelée une et une seule fois,
-   * lors du chargement de la scene dans le jeu.
-   * On y trouve surtout le chargement des assets (images, son ..)
-   */
   preload() {
-    // tous les assets du jeu sont placés dans le sous-répertoire src/assets/
-    this.load.image("img_ciel", "src/assets/sky.png");
-    this.load.image("img_livre", "src/assets/book.png");
+    this.load.image(SKY_IMAGE_KEY, "src/assets/sky.png");
+    this.load.image(BOOK_IMAGE_KEY, "src/assets/book.png");
   }
 
-  /***********************************************************************/
-  /** FONCTION CREATE 
-/***********************************************************************/
-
-  /* La fonction create est appelée lors du lancement de la scene
-   * si on relance la scene, elle sera appelée a nouveau
-   * on y trouve toutes les instructions permettant de créer la scene
-   * placement des peronnages, des sprites, des platesformes, création des animations
-   * ainsi que toutes les instructions permettant de planifier des evenements
-   */
   create() {
-      fct.doNothing();
-      fct.doAlsoNothing();
+    fct.doNothing();
+    fct.doAlsoNothing();
 
-    // On ajoute une simple image de fond, le ciel, au centre de la zone affichée (400, 300)
-    // Par défaut le point d'ancrage d'une image est le centre de cette derniere
-    this.add.image(400, 300, "img_ciel");
-    this.add.image(400, 300, "img_livre");
-    
+    this.add.image(400, 300, SKY_IMAGE_KEY);
+
+    // Ajout de l'image du livre
+    const livreImage = this.add.image(400, 300, BOOK_IMAGE_KEY);
+
+    // Ajout du texte sur l'image du livre
+    livreTexte = this.add.text(
+      livreImage.x - livreImage.width / 2 + 70,
+      livreImage.y - livreImage.height / 2 + 80,
+      "",
+      {
+        fontFamily: "Arial",
+        fontSize: "17px",
+        color: "#000000",
+      }
+    );
+
+    // Ajout de la fonctionnalité d'affichage lettre par lettre
+    this.time.delayedCall(100, this.afficherTexteLettreParLettre, [], this);
   }
-
-  /***********************************************************************/
-  /** FONCTION UPDATE 
-/***********************************************************************/
 
   update() {
-    //ajout de texte dynamique 
+    // Vous pouvez ajouter ici des logiques de mise à jour si nécessaire
+  }
+
+  afficherTexteLettreParLettre() {
+    const texteComplet = "Bonjour jeune peufien,\n\nJe suis ton responsable pédagogique.\n\nIl te manque malheureusement 8 crédits\n\npour valider le semestre.Tu dois te rendre\n\ndans les salles M01,M02 et M03 à la\n\nrencontre de tes professeurs pour discuter\n\nde ton cas.\n\n\n                                                                                                  Bonne chance !!!";
+    let textePartiel = "";
+    let indexLettre = 0;
+
+    this.time.addEvent({
+      repeat: texteComplet.length - 1,
+      delay: 50,
+      callback: function () {
+        textePartiel += texteComplet[indexLettre];
+        livreTexte.setText(textePartiel);
+        indexLettre++;
+      },
+      callbackScope: this,
+    });
   }
 }
-
-/***********************************************************************/
-/** CONFIGURATION GLOBALE DU JEU ET LANCEMENT 
-/***********************************************************************/
